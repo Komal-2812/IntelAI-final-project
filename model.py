@@ -70,6 +70,5 @@ st.markdown(f"""
 
 # 🔧 Fix: Convert to float
 st.progress(float(confidence))
-
 else:
     st.info("📂 Upload or capture a wafer image to start the prediction.")
