@@ -57,16 +57,19 @@ if image:
     predicted_class = class_names[np.argmax(prediction)]
     confidence = np.max(prediction)
 
-    # Display prediction results
-    result_color = "#28a745" if predicted_class == "Pass" else "#dc3545"
-    result_icon = "✅" if predicted_class == "Pass" else "❌"
+  # Display prediction results
+result_color = "#28a745" if predicted_class == "Pass" else "#dc3545"
+result_icon = "✅" if predicted_class == "Pass" else "❌"
 
-    st.markdown(f"""
-        <div style="text-align:center; margin-top:30px;">
-            <h2 style="color:{result_color};">{result_icon} Result: {predicted_class}</h2>
-            <p style="font-size:18px;">Confidence: <b>{confidence * 100:.2f}%</b></p>
-        </div>
-    """, unsafe_allow_html=True)
-    st.progress(confidence)
+st.markdown(f"""
+    <div style="text-align:center; margin-top:30px;">
+        <h2 style="color:{result_color};">{result_icon} Result: {predicted_class}</h2>
+        <p style="font-size:18px;">Confidence: <b>{confidence * 100:.2f}%</b></p>
+    </div>
+""", unsafe_allow_html=True)
+
+# 🔧 Fix: Convert to float
+st.progress(float(confidence))
+
 else:
     st.info("📂 Upload or capture a wafer image to start the prediction.")
