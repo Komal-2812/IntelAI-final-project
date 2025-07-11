@@ -43,10 +43,10 @@ with st.container():
             except Exception as e:
                 st.error("⚠️ Could not access image.")
 
-# Process and predict
+# Predict if image is loaded
 if image:
     st.image(image, caption="🔍 Input Wafer Image", use_container_width=True)
-    
+
     # Preprocess image
     image = image.resize((224, 224))
     img_array = np.asarray(image).astype(np.float32) / 255.0
@@ -57,18 +57,18 @@ if image:
     predicted_class = class_names[np.argmax(prediction)]
     confidence = np.max(prediction)
 
-  # Display prediction results
-result_color = "#28a745" if predicted_class == "Pass" else "#dc3545"
-result_icon = "✅" if predicted_class == "Pass" else "❌"
+    # Display
+    result_color = "#28a745" if predicted_class == "Pass" else "#dc3545"
+    result_icon = "✅" if predicted_class == "Pass" else "❌"
 
-st.markdown(f"""
-    <div style="text-align:center; margin-top:30px;">
-        <h2 style="color:{result_color};">{result_icon} Result: {predicted_class}</h2>
-        <p style="font-size:18px;">Confidence: <b>{confidence * 100:.2f}%</b></p>
-    </div>
-""", unsafe_allow_html=True)
+    st.markdown(f"""
+        <div style="text-align:center; margin-top:30px;">
+            <h2 style="color:{result_color};">{result_icon} Result: {predicted_class}</h2>
+            <p style="font-size:18px;">Confidence: <b>{confidence * 100:.2f}%</b></p>
+        </div>
+    """, unsafe_allow_html=True)
 
-# 🔧 Fix: Convert to float
-st.progress(float(confidence))
+    st.progress(float(confidence))
+
 else:
     st.info("📂 Upload or capture a wafer image to start the prediction.")
