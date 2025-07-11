@@ -1,5 +1,5 @@
 import streamlit as st
-import tensorflow as tf
+import tensorflow as tf 
 import numpy as np
 from PIL import Image
 import io
@@ -7,103 +7,42 @@ import io
 # Load the model
 model = tf.keras.models.load_model("keras.h5")
 
-# Class labels
-class_names = ['Pass', 'Fail']
+# Define class labels
+class_names = ['Normal', 'Defective']
 
-# Set Streamlit config
-st.set_page_config(page_title="Wafer Classifier", layout="wide")
+# Page setup
+st.set_page_config(page_title="🔍 Wafer Defect Detector", layout="centered")
+st.markdown("<h1 style='text-align: center; color: #00BFFF;'>🔬 Semiconductor Wafer Classification</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Upload an image or take a photo to detect whether the wafer is <b>Normal</b> or <b>Defective</b>.</p>", unsafe_allow_html=True)
+st.markdown("---")
 
-# 💅 Dark theme custom CSS
-st.markdown("""
-    <style>
-    body {
-        background-color: #0f0f0f;
-        color: white;
-    }
-    .stApp {
-        background-color: #0f0f0f;
-    }
-    .title {
-        font-size: 48px;
-        color: #00ffe7;
-        text-align: center;
-        margin-top: 30px;
-        font-weight: bold;
-        letter-spacing: 1px;
-    }
-    .subtitle {
-        text-align: center;
-        font-size: 18px;
-        color: #cccccc;
-        margin-bottom: 30px;
-    }
-    .card {
-        background: rgba(255, 255, 255, 0.05);
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        margin: auto;
-        max-width: 800px;
-    }
-    .result-pass {
-        color: #00ff91;
-        font-size: 32px;
-        text-align: center;
-        font-weight: bold;
-    }
-    .result-fail {
-        color: #ff3c3c;
-        font-size: 32px;
-        text-align: center;
-        font-weight: bold;
-    }
-    .emoji {
-        font-size: 60px;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    .confidence-bar .stProgress > div > div {
-        background-image: linear-gradient(to right, #1cefff, #00ff91);
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# 🧠 Title & intro
-st.markdown("<div class='title'>🔬 Wafer Pass/Fail Prediction</div>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Upload or capture a wafer image to predict whether it passes ✅ or fails ❌ the inspection.</p>", unsafe_allow_html=True)
-
-# Input method
-input_method = st.radio("📷 Select Image Input Method:", ["📁 Upload Image", "📸 Use Camera"], horizontal=True, label_visibility="collapsed")
+# Choose input method
+input_method = st.radio("📸 Choose Image Input Method:", ("Upload Image", "Use Camera"), horizontal=True)
 
 image = None
 
-# Input block
 with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    if input_method == "📁 Upload Image":
-        uploaded_file = st.file_uploader("📂 Upload Wafer Image", type=["jpg", "jpeg", "png"])
+    if input_method == "Upload Image":
+        uploaded_file = st.file_uploader("🖼️ Upload a wafer image", type=["jpg", "jpeg", "png"])
         if uploaded_file:
             try:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
-            except:
-                st.error("❌ Could not read the uploaded file.")
-    elif input_method == "📸 Use Camera":
-        camera_image = st.camera_input("📷 Capture Wafer Photo")
+            except Exception as e:
+                st.error("⚠ Could not read the image. Please upload a valid image file.")
+    elif input_method == "Use Camera":
+        camera_image = st.camera_input("📷 Take a picture")
         if camera_image:
             try:
                 image = Image.open(camera_image)
-            except:
-                st.error("❌ Camera input failed.")
-    st.markdown("</div>", unsafe_allow_html=True)
+            except Exception as e:
+                st.error("⚠ Could not access the image from camera.")
 
-# Prediction block
+# Predict if image is loaded
 if image:
-    st.image(image, caption="📸 Input Image", use_container_width=True)
+    st.markdown("---")
+    st.image(image, caption="🖼️ Uploaded Image", use_container_width=True)
 
-    # Preprocess
+    # Preprocess the image
     image = image.resize((224, 224))
     img_array = np.asarray(image).astype(np.float32) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
@@ -111,25 +50,11 @@ if image:
     # Predict
     prediction = model.predict(img_array)
     predicted_class = class_names[np.argmax(prediction)]
-    confidence = float(np.max(prediction))
+    confidence = np.max(prediction)
 
-    result_icon = "✅" if predicted_class == "Pass" else "❌"
-    result_class = "result-pass" if predicted_class == "Pass" else "result-fail"
-    emoji_line = "🟢🟢🟢" if predicted_class == "Pass" else "🔴🔴🔴"
-
-    # Output result
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown(f"<div class='emoji'>{emoji_line}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='{result_class}'>{result_icon} Result: {predicted_class.upper()}</div>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align:center; font-size:18px;'>Confidence: <b>{confidence * 100:.2f}%</b></p>", unsafe_allow_html=True)
-
-    # Confidence bar
-    with st.container():
-        st.markdown("<div class='confidence-bar'>", unsafe_allow_html=True)
-        st.progress(confidence)
-        st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
+    # Result Output
+    st.markdown(f"<h3 style='color: #4CAF50;'>🧠 Prediction: {predicted_class}</h3>", unsafe_allow_html=True)
+    st.markdown(f"<h4 style='color: #555;'>📊 Confidence: {confidence*100:.2f}%</h4>", unsafe_allow_html=True)
+    st.progress(float(confidence))
 else:
-    st.markdown("<br>")
-    st.info("📂 Please upload or capture a wafer image to get the prediction.")
+    st.info("📂 Please upload or capture a wafer image to start.")
