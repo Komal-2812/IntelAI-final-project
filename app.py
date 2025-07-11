@@ -7,7 +7,7 @@ import io
 
 
 # Load the model
-model = tf.keras.models.load_model(r"C:\Users\91743\Desktop\final project\keras.h5")
+model = tf.keras.models.load_model("keras.h5")
 
 # Define class labels based on your training
 class_names = ['Normal', 'Defective']  # Modify if you used different class names
