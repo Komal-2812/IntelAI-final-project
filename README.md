@@ -60,10 +60,15 @@ This tool helps in identifying defective semiconductor wafers via a visual inter
 ## 📁 Project Structure
 
 wafer-pass-fail-app/
+
 ├── model.py  # Streamlit app code
+
 ├── keras.h5 # Trained Keras model file
+
 ├── requirements.txt # Python dependencies
+
 ├── runtime.txt # Python version for Streamlit Cloud
+
 └── README.md # Project overview
 
 ### 👨‍💻 Developed By
