@@ -71,6 +71,8 @@ wafer-pass-fail-app/
 
 └── README.md # Project overview
 
+---
+
 ### 👨‍💻 Developed By
 
 - Komal Makwana  
